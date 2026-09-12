@@ -130,9 +130,11 @@ app.get(["/consent", "/consent/:condition"], (req, res) => {
   }
 });
 
-app.get("/consent", (req, res) => {
-  const condition = (req.query.condition || "A").toUpperCase() === "B" ? "B" : "A";
-  const participantId = randomUUID();
+app.get("/generate-qr", async (req, res) => {
+  const condition = ...
+  const targetUrl = `${BASE_URL}/consent/${condition}`;
+  try {
+    const qrDataUrl = await QRCode.toDataURL(targetUrl, ...
 
   res.send(pageShell({
     title: "Research Consent — The Ethical Phish",
