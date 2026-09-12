@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Live Dashboard — The Ethical Phish</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --navy:#1F3864; --navy-dark:#14213D; --gold:#C9A227; --gold-light:#E4C55A; --light:#F6F4EC; --grey:#8892a3; --green:#3fa34d; --red:#e0564a; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:'Inter', -apple-system, Segoe UI, Arial, sans-serif; background: radial-gradient(circle at top, #24406e 0%, #0f1a30 60%); color:#fff; min-height:100vh; }
+  header { padding: 26px 40px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08); }
+  header .brand { display:flex; align-items:center; gap:12px; }
+  header .mark { width:36px; height:36px; border-radius:10px; background: linear-gradient(135deg, var(--gold-light), var(--gold)); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:15px; color:var(--navy-dark); }
+  header h1 { font-size:19px; margin:0; font-weight:700; letter-spacing:-0.2px; }
+  header .tag { color:var(--gold-light); font-size:11.5px; font-weight:600; letter-spacing:1px; margin-top:2px; }
+  .live-dot { display:inline-block; width:8px; height:8px; border-radius:50%; background:#4ade80; margin-right:8px; animation: pulse 1.5s infinite; box-shadow:0 0 8px #4ade80; }
+  @keyframes pulse { 0%{opacity:1;} 50%{opacity:0.3;} 100%{opacity:1;} }
+  main { padding: 34px 40px 50px; max-width:1200px; margin:0 auto; }
+  .total-card { background: linear-gradient(135deg, rgba(31,56,100,0.6), rgba(15,26,48,0.6)); backdrop-filter: blur(10px); border:1px solid rgba(201,162,39,0.35); border-radius:16px; padding:28px 34px; margin-bottom:28px; display:flex; justify-content:space-between; align-items:center; }
+  .total-card .num { font-size:50px; font-weight:800; color:var(--gold-light); line-height:1; }
+  .total-card .lbl { font-size:12px; color:#b8c2d4; text-transform:uppercase; letter-spacing:1.2px; margin-bottom:6px; }
+  .cols { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:28px; }
+  .cond-card { background:#fff; color:#222; border-radius:16px; padding:24px 26px; box-shadow:0 10px 30px rgba(0,0,0,0.2); }
+  .cond-card h2 { font-size:15px; margin:0 0 4px; color:var(--navy-dark); font-weight:700; }
+  .cond-card .subtitle { font-size:12px; color:#8892a3; margin-bottom:18px; }
+  .metric-row { display:flex; justify-content:space-between; font-size:13px; color:#8892a3; margin:11px 0 5px; }
+  .metric-row b { color:var(--navy-dark); font-size:15px; }
+  .bar-bg { height:12px; background:#f0f0f0; border-radius:7px; overflow:hidden; margin-bottom:16px; }
+  .bar-fill { height:100%; border-radius:7px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
+  .barA .bar-fill { background: linear-gradient(90deg, var(--navy), #3a5c96); }
+  .barB .bar-fill { background: linear-gradient(90deg, var(--gold), var(--gold-light)); }
+  .rate { font-size:28px; font-weight:800; }
+  table { width:100%; border-collapse:collapse; background:#fff; color:#222; border-radius:16px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.2); }
+  th, td { text-align:left; padding:12px 18px; font-size:13px; }
+  th { background: linear-gradient(135deg, var(--navy), var(--navy-dark)); color:#fff; font-weight:600; font-size:10.5px; text-transform:uppercase; letter-spacing:0.6px; }
+  tr:nth-child(even) { background:#f9f9fb; }
+  .action-submitted { color:var(--red); font-weight:700; }
+  .action-viewed { color:#8892a3; }
+  .action-consent_agreed { color:var(--green); font-weight:600; }
+  .action-consent_declined { color:#b91c1c; font-weight:600; }
+  .action-consent_viewed { color:#8892a3; }
+  .empty { text-align:center; padding:34px; color:#aaa; font-size:13px; }
+  footer { text-align:center; padding:22px; font-size:11px; color:#7a879c; }
+</style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="mark">TE</div>
+      <div>
+        <h1>The Ethical Phish</h1>
+        <div class="tag">LIVE RESEARCH DASHBOARD</div>
+      </div>
+    </div>
+    <div><span class="live-dot"></span><span style="font-size:13px; color:#b8c2d4;">Auto-refreshing every 5s</span></div>
+  </header>
+  <main>
+    <div class="total-card">
+      <div>
+        <div class="lbl">Total Participants</div>
+        <div class="num" id="totalCount">0</div>
+      </div>
+      <div style="text-align:right; font-size:12px; color:#aaa;">Last updated<br><span id="lastUpdated">—</span></div>
+    </div>
+
+    <div class="cols">
+      <div class="cond-card">
+        <h2>Condition A — Plain Design</h2>
+        <div class="subtitle">Student Services Password Reset</div>
+        <div class="metric-row" style="margin-top:0;"><span>Consent shown</span><b id="consentViewsA">0</b></div>
+        <div class="metric-row"><span>Agreed to consent</span><b id="consentedA">0</b></div>
+        <div class="metric-row"><span>Declined</span><b id="declinedA">0</b></div>
+        <div class="metric-row"><span style="font-weight:600; color:var(--navy-dark);">Consent rate</span><b id="consentRateA">0%</b></div>
+        <div class="bar-bg barA"><div class="bar-fill" id="consentBarA" style="width:0%;"></div></div>
+        <div class="rate" id="rateA">0%</div>
+        <div style="font-size:12px; color:var(--grey); margin-bottom:10px;">disclosure rate (of consented participants)</div>
+        <div class="bar-bg barA"><div class="bar-fill" id="barA" style="width:0%;"></div></div>
+        <div class="metric-row"><span>Views</span><b id="viewsA">0</b></div>
+        <div class="metric-row"><span>Submitted</span><b id="submitsA">0</b></div>
+        <div class="metric-row"><span>Avg. time-to-decision</span><b id="timeA">—</b></div>
+      </div>
+      <div class="cond-card">
+        <h2>Condition B — Incentive-Framed</h2>
+        <div class="subtitle">Claim Your Exam Voucher</div>
+        <div class="metric-row" style="margin-top:0;"><span>Consent shown</span><b id="consentViewsB">0</b></div>
+        <div class="metric-row"><span>Agreed to consent</span><b id="consentedB">0</b></div>
+        <div class="metric-row"><span>Declined</span><b id="declinedB">0</b></div>
+        <div class="metric-row"><span style="font-weight:600; color:var(--navy-dark);">Consent rate</span><b id="consentRateB">0%</b></div>
+        <div class="bar-bg barB"><div class="bar-fill" id="consentBarB" style="width:0%;"></div></div>
+        <div class="rate" id="rateB">0%</div>
+        <div style="font-size:12px; color:var(--grey); margin-bottom:10px;">disclosure rate (of consented participants)</div>
+        <div class="bar-bg barB"><div class="bar-fill" id="barB" style="width:0%;"></div></div>
+        <div class="metric-row"><span>Views</span><b id="viewsB">0</b></div>
+        <div class="metric-row"><span>Submitted</span><b id="submitsB">0</b></div>
+        <div class="metric-row"><span>Avg. time-to-decision</span><b id="timeB">—</b></div>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr><th>Participant</th><th>Condition</th><th>Action</th><th>Time to Decision</th><th>Timestamp</th></tr>
+      </thead>
+      <tbody id="recentBody">
+        <tr><td colspan="5" class="empty">No events yet — scan a QR code to begin.</td></tr>
+      </tbody>
+    </table>
+  </main>
+  <footer>No form field values are ever collected — only event metadata. Data is used for the ENVISION 2026 research study.</footer>
+
+<script>
+async function refresh() {
+  try {
+    const res = await fetch('/api/stats');
+    const data = await res.json();
+
+    document.getElementById('totalCount').textContent = data.total;
+    document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
+
+    ['A', 'B'].forEach(c => {
+      const d = data.byCondition[c] || { consentViews: 0, consented: 0, declined: 0, consentRate: 0, views: 0, submits: 0, disclosureRate: 0, avgTimeToDecision: null };
+      document.getElementById('consentViews' + c).textContent = d.consentViews;
+      document.getElementById('consented' + c).textContent = d.consented;
+      document.getElementById('declined' + c).textContent = d.declined;
+      document.getElementById('consentRate' + c).textContent = d.consentRate + '%';
+      document.getElementById('consentBar' + c).style.width = d.consentRate + '%';
+      document.getElementById('rate' + c).textContent = d.disclosureRate + '%';
+      document.getElementById('bar' + c).style.width = d.disclosureRate + '%';
+      document.getElementById('views' + c).textContent = d.views;
+      document.getElementById('submits' + c).textContent = d.submits;
+      document.getElementById('time' + c).textContent = d.avgTimeToDecision ? d.avgTimeToDecision + 's' : '—';
+    });
+
+    const body = document.getElementById('recentBody');
+    if (!data.recent || data.recent.length === 0) {
+      body.innerHTML = '<tr><td colspan="5" class="empty">No events yet — scan a QR code to begin.</td></tr>';
+    } else {
+      body.innerHTML = data.recent.map(ev => `
+        <tr>
+          <td>${ev.participant_id.slice(0, 8)}…</td>
+          <td>${ev.condition_id}</td>
+          <td class="action-${ev.action}">${ev.action}</td>
+          <td>${ev.time_to_decision ? ev.time_to_decision.toFixed(1) + 's' : '—'}</td>
+          <td>${ev.created_at}</td>
+        </tr>
+      `).join('');
+    }
+  } catch (err) {
+    console.error('Dashboard refresh failed:', err);
+  }
+}
+refresh();
+setInterval(refresh, 5000);
+</script>
+</body>
+</html>
