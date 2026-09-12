@@ -87,7 +87,7 @@ function pageShell({ title, bodyClass = "", content, showFooterNote = true }) {
 </html>`;
 }
 
-// ---------- Routes ----------
+// ---------- Home / presenter console ----------
 app.get("/", (req, res) => {
   res.send(pageShell({
     title: "The Ethical Phish — Presenter Console",
@@ -107,9 +107,9 @@ app.get("/", (req, res) => {
   }));
 });
 
-app.get(["/consent", "/consent/:condition"], (req, res) => {
-  const raw = req.params.condition || req.query.condition || "A";
-  const condition = raw.toUpperCase() === "B" ? "B" : "A";
+// ---------- QR generation ----------
+app.get("/generate-qr", async (req, res) => {
+  const condition = (req.query.condition || "A").toUpperCase() === "B" ? "B" : "A";
   const targetUrl = `${BASE_URL}/consent/${condition}`;
   try {
     const qrDataUrl = await QRCode.toDataURL(targetUrl, { width: 400, margin: 2, color: { dark: "#1F3864", light: "#FFFFFF" } });
@@ -117,7 +117,7 @@ app.get(["/consent", "/consent/:condition"], (req, res) => {
       title: `QR Code — Condition ${condition}`,
       showFooterNote: false,
       content: `
-        <span class="badge">CONDITION ${condition}</span>
+        <span class="badge">CONDITION ${condition} &middot; ${conditionLabel(condition).toUpperCase()}</span>
         <h1>Scan to open the simulated page</h1>
         <div style="text-align:center; padding:20px; background:#fafafa; border-radius:12px;">
           <img src="${qrDataUrl}" alt="QR code" style="width:100%; max-width:320px;">
@@ -130,11 +130,11 @@ app.get(["/consent", "/consent/:condition"], (req, res) => {
   }
 });
 
-app.get("/generate-qr", async (req, res) => {
-  const condition = ...
-  const targetUrl = `${BASE_URL}/consent/${condition}`;
-  try {
-    const qrDataUrl = await QRCode.toDataURL(targetUrl, ...
+// ---------- Consent screen ----------
+app.get(["/consent", "/consent/:condition"], (req, res) => {
+  const raw = req.params.condition || req.query.condition || "A";
+  const condition = raw.toUpperCase() === "B" ? "B" : "A";
+  const participantId = randomUUID();
 
   res.send(pageShell({
     title: "Research Consent — The Ethical Phish",
@@ -176,6 +176,7 @@ app.get("/generate-qr", async (req, res) => {
   `);
 });
 
+// ---------- Sandbox pages ----------
 app.get("/sandbox/:condition", (req, res) => {
   const condition = req.params.condition.toUpperCase() === "B" ? "B" : "A";
   const participantId = typeof req.query.pid === "string" && req.query.pid.length > 0 ? req.query.pid : randomUUID();
@@ -224,6 +225,7 @@ app.get("/sandbox/:condition", (req, res) => {
   `);
 });
 
+// ---------- Event logging ----------
 app.post("/log-event", (req, res) => {
   const { participantId, condition, action, timeToDecision } = req.body || {};
   if (!participantId || !condition || !action) return res.status(400).json({ error: "Missing fields" });
@@ -236,6 +238,7 @@ app.post("/log-event", (req, res) => {
   res.json({ ok: true });
 });
 
+// ---------- Debrief ----------
 app.get("/debrief", (req, res) => {
   const condition = (req.query.condition || "A").toUpperCase() === "B" ? "B" : "A";
   const t = req.query.t ? `${req.query.t}s` : "—";
@@ -260,6 +263,7 @@ app.get("/debrief", (req, res) => {
   }));
 });
 
+// ---------- Stats ----------
 app.get("/api/stats", (req, res) => {
   const events = readEvents();
   const totals = { total: new Set(events.map(e => e.participant_id)).size };
@@ -284,11 +288,13 @@ app.get("/api/stats", (req, res) => {
   res.json({ total: totals.total, byCondition, recent });
 });
 
+// ---------- Reset ----------
 app.post("/api/reset", (req, res) => {
   writeEvents([]);
   res.json({ ok: true });
 });
 
+// ---------- Dashboard ----------
 app.get("/dashboard", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "dashboard.html"));
 });
