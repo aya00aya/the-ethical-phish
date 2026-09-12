@@ -107,9 +107,10 @@ app.get("/", (req, res) => {
   }));
 });
 
-app.get("/generate-qr", async (req, res) => {
-  const condition = (req.query.condition || "A").toUpperCase() === "B" ? "B" : "A";
-  const targetUrl = `${BASE_URL}/consent?condition=${condition}`;
+app.get(["/consent", "/consent/:condition"], (req, res) => {
+  const raw = req.params.condition || req.query.condition || "A";
+  const condition = raw.toUpperCase() === "B" ? "B" : "A";
+  const targetUrl = `${BASE_URL}/consent/${condition}`;
   try {
     const qrDataUrl = await QRCode.toDataURL(targetUrl, { width: 400, margin: 2, color: { dark: "#1F3864", light: "#FFFFFF" } });
     res.send(pageShell({
