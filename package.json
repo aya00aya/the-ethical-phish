@@ -1,0 +1,17 @@
+{
+  "name": "the-ethical-phish",
+  "version": "1.0.0",
+  "description": "The Ethical Phish — ENVISION 2026 consent-based QR code phishing (quishing) simulation and research framework",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.3.0",
+    "express": "^4.19.2",
+    "qrcode": "^1.5.3"
+  }
+}
