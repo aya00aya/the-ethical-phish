@@ -302,3 +302,11 @@ app.get("/dashboard", (req, res) => {
 app.listen(PORT, () => {
   console.log(`The Ethical Phish running on port ${PORT}`);
 });
+
+// ---------- Export endpoint ----------
+app.get("/api/export", (req, res) => {
+  const events = readEvents();
+  res.setHeader("Content-Type", "application/json");
+  res.setHeader("Content-Disposition", "attachment; filename=events.json");
+  res.send(JSON.stringify(events, null, 2));
+});
