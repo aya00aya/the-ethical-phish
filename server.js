@@ -77,7 +77,7 @@ function pageShell({ title, bodyClass = "", content, showFooterNote = true }) {
 </head>
 <body>
   <div class="wrap ${bodyClass}">
-    <div class="topbar"><div class="mark">TE</div><span>STUDENT PORTAL</span></div>
+<div class="topbar"><div class="mark">SP</div><span>STUDENT PORTAL</span></div>
     <div class="content">
       ${content}
       ${showFooterNote ? `<div class="footnote">Research Simulation Environment &middot; The Ethical Phish</div>` : ""}
