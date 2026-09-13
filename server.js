@@ -1,8 +1,6 @@
 /**
  * The Ethical Phish — ENVISION 2026 Quishing Research Framework
  * Consent-based QR-phishing susceptibility simulation.
- *
- * Uses a plain JSON file for storage — no native compilation needed.
  */
 
 const express = require("express");
@@ -77,7 +75,7 @@ function pageShell({ title, bodyClass = "", content, showFooterNote = true }) {
 </head>
 <body>
   <div class="wrap ${bodyClass}">
-<div class="topbar"><div class="mark">SP</div><span>STUDENT PORTAL</span></div>
+    <div class="topbar"><div class="mark">SP</div><span>STUDENT PORTAL</span></div>
     <div class="content">
       ${content}
       ${showFooterNote ? `<div class="footnote">Research Simulation Environment &middot; The Ethical Phish</div>` : ""}
@@ -103,6 +101,8 @@ app.get("/", (req, res) => {
       </p>
       <label>Live dashboard</label>
       <p style="font-size:14px;"><a href="/dashboard" style="color:var(--navy); font-weight:600;">Open live dashboard →</a></p>
+      <label>Download data</label>
+      <p style="font-size:14px;"><a href="/api/export" style="color:var(--navy); font-weight:600;">Download events.json →</a></p>
     `,
   }));
 });
@@ -288,6 +288,14 @@ app.get("/api/stats", (req, res) => {
   res.json({ total: totals.total, byCondition, recent });
 });
 
+// ---------- Export (DOWNLOAD YOUR DATA) ----------
+app.get("/api/export", (req, res) => {
+  const events = readEvents();
+  res.setHeader("Content-Type", "application/json");
+  res.setHeader("Content-Disposition", "attachment; filename=ethical-phish-events.json");
+  res.send(JSON.stringify(events, null, 2));
+});
+
 // ---------- Reset ----------
 app.post("/api/reset", (req, res) => {
   writeEvents([]);
@@ -301,12 +309,4 @@ app.get("/dashboard", (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`The Ethical Phish running on port ${PORT}`);
-});
-
-// ---------- Export endpoint ----------
-app.get("/api/export", (req, res) => {
-  const events = readEvents();
-  res.setHeader("Content-Type", "application/json");
-  res.setHeader("Content-Disposition", "attachment; filename=events.json");
-  res.send(JSON.stringify(events, null, 2));
 });
